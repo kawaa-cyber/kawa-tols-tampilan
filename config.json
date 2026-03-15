@@ -1,0 +1,11 @@
+{
+    "theme": "matrix",
+    "auto_update": true,
+    "matrix_speed": 0.05,
+    "language": "en",
+    "animations": true,
+    "show_banner": true,
+    "tools_directory": "/sdcard/kawa-tools",
+    "last_update": "2026-03-15",
+    "version": "3.0"
+}
