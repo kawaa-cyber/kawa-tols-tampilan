@@ -1,0 +1,91 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+KAWA CYBER TERMINAL - Installer
+Author: Kawa Cyber Team
+"""
+
+import os
+import sys
+import time
+import subprocess
+
+# Colors
+class Colors:
+    GREEN = '\033[92m'
+    RED = '\033[91m'
+    YELLOW = '\033[93m'
+    BLUE = '\033[94m'
+    CYAN = '\033[96m'
+    END = '\033[0m'
+
+def print_banner():
+    banner = f"""
+{Colors.CYAN}╔═══════════════════════════════════════════════════════════════════╗
+║                                                                       ║
+║{Colors.GREEN}    ██╗  ██╗ █████╗ ██╗    ██╗ █████╗     {Colors.CYAN}                    ║
+║{Colors.GREEN}    ██║ ██╔╝██╔══██╗██║    ██║██╔══██╗    {Colors.CYAN}                    ║
+║{Colors.GREEN}    █████╔╝ ███████║██║ █╗ ██║███████║    {Colors.CYAN}                    ║
+║{Colors.GREEN}    ██╔═██╗ ██╔══██║██║███╗██║██╔══██║    {Colors.CYAN}                    ║
+║{Colors.GREEN}    ██║  ██╗██║  ██║╚███╔███╔╝██║  ██║    {Colors.CYAN}                    ║
+║{Colors.GREEN}    ╚═╝  ╚═╝╚═╝  ╚═╝ ╚══╝╚══╝ ╚═╝  ╚═╝    {Colors.CYAN}                    ║
+║{Colors.YELLOW}         ███████╗███╗   ██╗███████╗████████╗ █████╗ ██╗     ██╗     {Colors.CYAN}║
+║{Colors.YELLOW}         ██╔════╝████╗  ██║██╔════╝╚══██╔══╝██╔══██╗██║     ██║     {Colors.CYAN}║
+║{Colors.YELLOW}         █████╗  ██╔██╗ ██║█████╗     ██║   ███████║██║     ██║     {Colors.CYAN}║
+║{Colors.YELLOW}         ██╔══╝  ██║╚██╗██║██╔══╝     ██║   ██╔══██║██║     ██║     {Colors.CYAN}║
+║{Colors.YELLOW}         ███████╗██║ ╚████║███████╗   ██║   ██║  ██║███████╗███████╗{Colors.CYAN}║
+║{Colors.YELLOW}         ╚══════╝╚═╝  ╚═══╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚══════╝╚══════╝{Colors.CYAN}║
+║{Colors.BLUE}                         INSTALLER v1.0                                 {Colors.CYAN}║
+╚═══════════════════════════════════════════════════════════════════╝{Colors.END}
+"""
+    print(banner)
+
+def run_command(cmd, description):
+    print(f"{Colors.YELLOW}[•] {description}...{Colors.END}")
+    result = os.system(cmd)
+    if result == 0:
+        print(f"{Colors.GREEN}[✓] Success{Colors.END}")
+    else:
+        print(f"{Colors.RED}[✗] Failed{Colors.END}")
+    return result
+
+def main():
+    print_banner()
+    
+    print(f"{Colors.CYAN}╔{'═'*50}╗")
+    print(f"║{' ' * 15}INSTALLATION STARTED{' ' * 15}║")
+    print(f"╚{'═'*50}╝{Colors.END}\n")
+    
+    # Step 1: Update packages
+    run_command("pkg update -y", "Updating packages")
+    run_command("pkg upgrade -y", "Upgrading packages")
+    
+    # Step 2: Install dependencies
+    deps = ["python", "git", "nano", "wget", "curl"]
+    for dep in deps:
+        run_command(f"pkg install {dep} -y", f"Installing {dep}")
+    
+    # Step 3: Install Python packages
+    run_command("pip install requests colorama tqdm", "Installing Python modules")
+    
+    # Step 4: Create directories
+    os.makedirs("themes", exist_ok=True)
+    os.makedirs("modules", exist_ok=True)
+    
+    # Step 5: Create config
+    with open("config.json", "w") as f:
+        f.write('{"theme": "matrix", "auto_update": true}')
+    
+    print(f"\n{Colors.GREEN}╔{'═'*50}╗")
+    print(f"║{' ' * 15}INSTALLATION COMPLETE{' ' * 15}║")
+    print(f"╚{'═'*50}╝{Colors.END}")
+    
+    print(f"\n{Colors.CYAN}[✓] Run: python kawa_cyber.py{Colors.END}")
+    print(f"{Colors.YELLOW}[!] Make sure to grant storage permission:{Colors.END}")
+    print(f"    termux-setup-storage\n")
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        print(f"\n{Colors.RED}\n[!] Installation cancelled{Colors.END}")
