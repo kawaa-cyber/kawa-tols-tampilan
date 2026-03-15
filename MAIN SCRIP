@@ -1,0 +1,414 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+╔═══════════════════════════════════════════════════════════════════╗
+║                   KAWA CYBER TERMINAL v3.0                       ║
+║              ───────────────────────────────────                  ║
+║              [ Custom Termux Theme & Tools ]                      ║
+║                   Author: Kawa Cyber Team                         ║
+╚═══════════════════════════════════════════════════════════════════╝
+"""
+
+import os
+import sys
+import json
+import time
+import random
+import socket
+import platform
+import subprocess
+from datetime import datetime
+from pathlib import Path
+
+# ==================== COLOR CLASS ====================
+class Colors:
+    # Text Colors
+    BLACK = '\033[90m'
+    RED = '\033[91m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    BLUE = '\033[94m'
+    MAGENTA = '\033[95m'
+    CYAN = '\033[96m'
+    WHITE = '\033[97m'
+    ORANGE = '\033[38;5;208m'
+    PINK = '\033[38;5;206m'
+    PURPLE = '\033[38;5;129m'
+    
+    # Background Colors
+    BG_BLACK = '\033[40m'
+    BG_RED = '\033[41m'
+    BG_GREEN = '\033[42m'
+    BG_YELLOW = '\033[43m'
+    BG_BLUE = '\033[44m'
+    BG_MAGENTA = '\033[45m'
+    BG_CYAN = '\033[46m'
+    BG_WHITE = '\033[47m'
+    
+    # Styles
+    BOLD = '\033[1m'
+    DIM = '\033[2m'
+    ITALIC = '\033[3m'
+    UNDERLINE = '\033[4m'
+    BLINK = '\033[5m'
+    REVERSE = '\033[7m'
+    HIDDEN = '\033[8m'
+    STRIKE = '\033[9m'
+    
+    # Reset
+    END = '\033[0m'
+    CLEAR = '\033[2J\033[H'
+
+# ==================== ASCII ART ====================
+BANNER = f"""
+{Colors.CYAN}╔{'═'*60}╗
+║{' ' * 60}║
+║{Colors.GREEN}    ██╗  ██╗ █████╗ ██╗    ██╗ █████╗     {Colors.CYAN}                ║
+║{Colors.GREEN}    ██║ ██╔╝██╔══██╗██║    ██║██╔══██╗    {Colors.CYAN}                ║
+║{Colors.GREEN}    █████╔╝ ███████║██║ █╗ ██║███████║    {Colors.CYAN}                ║
+║{Colors.GREEN}    ██╔═██╗ ██╔══██║██║███╗██║██╔══██║    {Colors.CYAN}                ║
+║{Colors.GREEN}    ██║  ██╗██║  ██║╚███╔███╔╝██║  ██║    {Colors.CYAN}                ║
+║{Colors.GREEN}    ╚═╝  ╚═╝╚═╝  ╚═╝ ╚══╝╚══╝ ╚═╝  ╚═╝    {Colors.CYAN}                ║
+║{Colors.YELLOW}         ██████╗██╗   ██╗██████╗ ███████╗██████╗          {Colors.CYAN}║
+║{Colors.YELLOW}        ██╔════╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔══██╗         {Colors.CYAN}║
+║{Colors.YELLOW}        ██║      ╚████╔╝ ██████╔╝█████╗  ██████╔╝         {Colors.CYAN}║
+║{Colors.YELLOW}        ██║       ╚██╔╝  ██╔══██╗██╔══╝  ██╔══██╗         {Colors.CYAN}║
+║{Colors.YELLOW}        ╚██████╗   ██║   ██████╔╝███████╗██║  ██║         {Colors.CYAN}║
+║{Colors.YELLOW}         ╚═════╝   ╚═╝   ╚═════╝ ╚══════╝╚═╝  ╚═╝         {Colors.CYAN}║
+║{Colors.MAGENTA}            ████████╗███████╗██████╗ ███╗   ███╗██╗███╗   ██╗██╗  ██╗{Colors.CYAN}║
+║{Colors.MAGENTA}            ╚══██╔══╝██╔════╝██╔══██╗████╗ ████║██║████╗  ██║██║ ██╔╝{Colors.CYAN}║
+║{Colors.MAGENTA}               ██║   █████╗  ██████╔╝██╔████╔██║██║██╔██╗ ██║█████╔╝ {Colors.CYAN}║
+║{Colors.MAGENTA}               ██║   ██╔══╝  ██╔══██╗██║╚██╔╝██║██║██║╚██╗██║██╔═██╗ {Colors.CYAN}║
+║{Colors.MAGENTA}               ██║   ███████╗██║  ██║██║ ╚═╝ ██║██║██║ ╚████║██║  ██╗{Colors.CYAN}║
+║{Colors.MAGENTA}               ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝{Colors.CYAN}║
+║{' ' * 23} v3.0 - KAWA CYBER{' ' * 24}║
+╚{'═'*60}╝{Colors.END}
+"""
+
+# ==================== MENU ====================
+MENU = f"""
+{Colors.CYAN}┌{'─'*58}┐
+│{Colors.YELLOW}                      📋 MAIN MENU 📋                      {Colors.CYAN}│
+├{'─'*58}┤
+│                                                          │
+│  {Colors.GREEN}[01]{Colors.WHITE} 🚀 Update System        {Colors.GREEN}[06]{Colors.WHITE} 🌐 Network Tools    │
+│  {Colors.GREEN}[02]{Colors.WHITE} 🔧 Install Tools        {Colors.GREEN}[07]{Colors.WHITE} 📁 File Manager    │
+│  {Colors.GREEN}[03]{Colors.WHITE} 🎨 Change Theme         {Colors.GREEN}[08]{Colors.WHITE} ⚙️  Settings       │
+│  {Colors.GREEN}[04]{Colors.WHITE} ⚡ Animations           {Colors.GREEN}[09]{Colors.WHITE} 📊 Monitoring      │
+│  {Colors.GREEN}[05]{Colors.WHITE} 🕵️ Hacking Tools       {Colors.GREEN}[10]{Colors.WHITE} ❌ Exit           │
+│                                                          │
+├{'─'*58}┤
+│{Colors.CYAN} 📱 KAWA CYBER TERMINAL - v3.0                         │
+│{Colors.CYAN} 👨‍💻 Author: Kawa Cyber Team                              │
+└{'─'*58}┘{Colors.END}
+"""
+
+# ==================== ANIMATIONS ====================
+class Animations:
+    @staticmethod
+    def loading(text="Loading", duration=2):
+        anim = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
+        end = time.time() + duration
+        i = 0
+        while time.time() < end:
+            print(f"\r{Colors.CYAN}[{anim[i % len(anim)]}] {text}...{Colors.END}", end="")
+            time.sleep(0.1)
+            i += 1
+        print()
+
+    @staticmethod
+    def matrix_rain(duration=3):
+        chars = "01アイウエオカキクケコサシスセソタチツテト"
+        end = time.time() + duration
+        print(f"{Colors.GREEN}")
+        while time.time() < end:
+            line = ''.join(random.choice(chars) for _ in range(40))
+            print(f"{line[:random.randint(20,40)]}")
+            time.sleep(0.03)
+        print(f"{Colors.END}")
+
+    @staticmethod
+    def progress_bar(title="Processing", total=30):
+        print(f"{Colors.BOLD}{Colors.BLUE}{title}:{Colors.END}")
+        for i in range(total + 1):
+            bar = "█" * i + "░" * (total - i)
+            percent = (i / total) * 100
+            print(f"\r{Colors.GREEN}[{bar}] {percent:.1f}%{Colors.END}", end="")
+            time.sleep(0.05)
+        print()
+
+    @staticmethod
+    def typing(text, delay=0.05):
+        for char in text:
+            print(char, end='', flush=True)
+            time.sleep(delay)
+        print()
+
+# ==================== SYSTEM INFO ====================
+class SystemInfo:
+    @staticmethod
+    def get_ip():
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.connect(("8.8.8.8", 80))
+            ip = s.getsockname()[0]
+            s.close()
+            return ip
+        except:
+            return "127.0.0.1"
+
+    @staticmethod
+    def show_info():
+        os.system('clear' if os.name == 'posix' else 'cls')
+        print(f"{Colors.CLEAR}")
+        print(BANNER)
+        
+        info = f"""
+{Colors.CYAN}┌{'─'*58}┐
+│{Colors.YELLOW}                    SYSTEM INFORMATION                    {Colors.CYAN}│
+├{'─'*58}┤
+│                                                          │
+│  {Colors.GREEN}►{Colors.WHITE} User     : {Colors.BOLD}{Colors.GREEN}{os.getenv('USER', 'kawa')}{Colors.END}                         │
+│  {Colors.GREEN}►{Colors.WHITE} Hostname : {Colors.BOLD}{Colors.GREEN}{socket.gethostname()}{Colors.END}                    │
+│  {Colors.GREEN}►{Colors.WHITE} Platform : {Colors.BOLD}{Colors.GREEN}{platform.system()} {platform.machine()}{Colors.END}        │
+│  {Colors.GREEN}►{Colors.WHITE} IP Addr  : {Colors.BOLD}{Colors.GREEN}{SystemInfo.get_ip()}{Colors.END}                  │
+│  {Colors.GREEN}►{Colors.WHITE} Terminal : {Colors.BOLD}{Colors.GREEN}Termux{Colors.END}                               │
+│  {Colors.GREEN}►{Colors.WHITE} Date     : {Colors.BOLD}{Colors.GREEN}{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{Colors.END}      │
+│                                                          │
+└{'─'*58}┘{Colors.END}
+"""
+        print(info)
+
+# ==================== TOOLS MANAGER ====================
+class ToolsManager:
+    @staticmethod
+    def install_basic():
+        Animations.loading("Installing basic packages", 2)
+        cmds = [
+            "pkg update -y",
+            "pkg upgrade -y",
+            "pkg install python python2 -y",
+            "pkg install git -y",
+            "pkg install nano -y",
+            "pkg install wget -y",
+            "pkg install curl -y"
+        ]
+        for cmd in cmds:
+            print(f"{Colors.YELLOW}Executing: {cmd}{Colors.END}")
+            os.system(cmd)
+
+    @staticmethod
+    def install_hacking():
+        Animations.loading("Installing hacking tools", 3)
+        tools = [
+            "nmap",
+            "hydra",
+            "sqlmap",
+            "metasploit",
+            "wireshark",
+            "aircrack-ng",
+            "john",
+            "hashcat"
+        ]
+        for tool in tools:
+            print(f"{Colors.GREEN}Installing: {tool}{Colors.END}")
+            os.system(f"pkg install {tool} -y")
+
+    @staticmethod
+    def show_tools():
+        tools_list = f"""
+{Colors.CYAN}┌{'─'*58}┐
+│{Colors.YELLOW}                  AVAILABLE TOOLS                        {Colors.CYAN}│
+├{'─'*58}┤
+│                                                          │
+│  {Colors.GREEN}[01]{Colors.WHITE} Nmap         - Network Scanner                  │
+│  {Colors.GREEN}[02]{Colors.WHITE} SQLMap       - SQL Injection                   │
+│  {Colors.GREEN}[03]{Colors.WHITE} Hydra        - Password Cracker                │
+│  {Colors.GREEN}[04]{Colors.WHITE} Metasploit   - Exploitation Framework         │
+│  {Colors.GREEN}[05]{Colors.WHITE} Wireshark    - Packet Analyzer                 │
+│  {Colors.GREEN}[06]{Colors.WHITE} Aircrack-ng  - WiFi Security                  │
+│  {Colors.GREEN}[07]{Colors.WHITE} John         - Password Cracker                │
+│  {Colors.GREEN}[08]{Colors.WHITE} Hashcat      - GPU Password Cracker           │
+│  {Colors.GREEN}[09]{Colors.WHITE} Nikto        - Web Scanner                    │
+│  {Colors.GREEN}[10]{Colors.WHITE} Burp Suite   - Web Proxy                       │
+│                                                          │
+└{'─'*58}┘{Colors.END}
+"""
+        print(tools_list)
+
+# ==================== THEME MANAGER ====================
+class ThemeManager:
+    themes = {
+        "1": {"name": "Matrix", "color": Colors.GREEN},
+        "2": {"name": "Neon", "color": Colors.PINK},
+        "3": {"name": "Dark", "color": Colors.WHITE},
+        "4": {"name": "Cyber", "color": Colors.BLUE},
+        "5": {"name": "Blood", "color": Colors.RED},
+        "6": {"name": "Royal", "color": Colors.PURPLE}
+    }
+    
+    @staticmethod
+    def show_themes():
+        print(f"{Colors.CYAN}┌{'─'*58}┐")
+        print(f"│{Colors.YELLOW}                    AVAILABLE THEMES                     {Colors.CYAN}│")
+        print(f"├{'─'*58}┤")
+        for key, theme in ThemeManager.themes.items():
+            color = theme['color']
+            print(f"│  {color}[{key}]{Colors.WHITE} {theme['name']} Theme{' ' * (45 - len(theme['name']))}│")
+        print(f"└{'─'*58}┘{Colors.END}")
+
+    @staticmethod
+    def apply_theme(choice):
+        if choice in ThemeManager.themes:
+            theme = ThemeManager.themes[choice]
+            print(f"{theme['color']}")
+            print(f"""
+    ╔══════════════════════════════════════════════════╗
+    ║     {theme['name']} THEME ACTIVATED                    ║
+    ║     Restart Termux for full effect               ║
+    ╚══════════════════════════════════════════════════╝
+            """)
+            print(f"{Colors.END}")
+            
+            # Save theme config
+            with open("config.json", "w") as f:
+                json.dump({"theme": theme['name'].lower()}, f)
+
+# ==================== MAIN CLASS ====================
+class KawaCyberTerminal:
+    def __init__(self):
+        self.running = True
+        self.load_config()
+        
+    def load_config(self):
+        try:
+            with open("config.json", "r") as f:
+                self.config = json.load(f)
+        except:
+            self.config = {"theme": "matrix"}
+    
+    def clear_screen(self):
+        os.system('clear' if os.name == 'posix' else 'cls')
+    
+    def show_banner(self):
+        print(BANNER)
+    
+    def show_menu(self):
+        print(MENU)
+    
+    def handle_choice(self, choice):
+        if choice == "1":
+            self.clear_screen()
+            self.show_banner()
+            print(f"{Colors.BOLD}{Colors.GREEN}🚀 UPDATING SYSTEM...{Colors.END}")
+            ToolsManager.install_basic()
+            
+        elif choice == "2":
+            self.clear_screen()
+            self.show_banner()
+            print(f"{Colors.BOLD}{Colors.GREEN}🔧 INSTALLING TOOLS...{Colors.END}")
+            ToolsManager.install_hacking()
+            
+        elif choice == "3":
+            self.clear_screen()
+            self.show_banner()
+            ThemeManager.show_themes()
+            theme_choice = input(f"\n{Colors.YELLOW}Select theme [1-6]: {Colors.END}")
+            ThemeManager.apply_theme(theme_choice)
+            
+        elif choice == "4":
+            self.clear_screen()
+            self.show_banner()
+            print(f"{Colors.BOLD}{Colors.GREEN}⚡ ANIMATIONS{Colors.END}")
+            print(f"\n{Colors.CYAN}1. Matrix Rain")
+            print("2. Loading Animation")
+            print("3. Progress Bar")
+            print("4. Typing Effect{Colors.END}")
+            
+            anim = input(f"\n{Colors.YELLOW}Select animation: {Colors.END}")
+            if anim == "1":
+                Animations.matrix_rain(5)
+            elif anim == "2":
+                Animations.loading("Processing", 3)
+            elif anim == "3":
+                Animations.progress_bar("Downloading", 50)
+            elif anim == "4":
+                Animations.typing("KAWA CYBER TERMINAL v3.0 - Make Termux Great Again!", 0.05)
+                
+        elif choice == "5":
+            self.clear_screen()
+            self.show_banner()
+            ToolsManager.show_tools()
+            input(f"\n{Colors.YELLOW}Press Enter to continue...{Colors.END}")
+            
+        elif choice == "6":
+            self.clear_screen()
+            self.show_banner()
+            print(f"{Colors.BOLD}{Colors.GREEN}🌐 NETWORK TOOLS{Colors.END}")
+            print(f"""
+{Colors.CYAN}[1] Ping Test
+[2] Traceroute
+[3] DNS Lookup
+[4] Port Scan
+[5] Whois Lookup
+[6] Back to Main Menu{Colors.END}
+            """)
+            
+        elif choice == "7":
+            self.clear_screen()
+            self.show_banner()
+            print(f"{Colors.BOLD}{Colors.GREEN}📁 FILE MANAGER{Colors.END}")
+            os.system('ls -la')
+            
+        elif choice == "8":
+            self.clear_screen()
+            self.show_banner()
+            print(f"{Colors.BOLD}{Colors.GREEN}⚙️  SETTINGS{Colors.END}")
+            print(f"""
+{Colors.CYAN}[1] Change Language
+[2] Auto Update
+[3] Matrix Speed
+[4] Reset Config
+[5] About
+[6] Back to Main Menu{Colors.END}
+            """)
+            
+        elif choice == "9":
+            self.clear_screen()
+            self.show_banner()
+            SystemInfo.show_info()
+            input(f"\n{Colors.YELLOW}Press Enter to continue...{Colors.END}")
+            
+        elif choice == "10" or choice.lower() == 'exit':
+            print(f"{Colors.BOLD}{Colors.RED}")
+            Animations.typing("\nThank you for using KAWA CYBER TERMINAL!", 0.03)
+            Animations.typing("Stay safe and keep hacking! 🔥", 0.03)
+            print(f"{Colors.END}")
+            self.running = False
+            
+        else:
+            print(f"{Colors.RED}Invalid choice!{Colors.END}")
+            time.sleep(1)
+    
+    def run(self):
+        while self.running:
+            self.clear_screen()
+            SystemInfo.show_info()
+            self.show_menu()
+            
+            choice = input(f"\n{Colors.YELLOW}Select menu [1-10]: {Colors.END}")
+            self.handle_choice(choice)
+            
+            if self.running and choice not in ["10", "exit"]:
+                input(f"\n{Colors.CYAN}Press Enter to continue...{Colors.END}")
+
+# ==================== MAIN ====================
+if __name__ == "__main__":
+    try:
+        app = KawaCyberTerminal()
+        app.run()
+    except KeyboardInterrupt:
+        print(f"\n{Colors.RED}\n[!] Exiting...{Colors.END}")
+        sys.exit(0)
+    except Exception as e:
+        print(f"{Colors.RED}Error: {e}{Colors.END}")
