@@ -1,0 +1,10 @@
+# Python Dependencies for KAWA CYBER TERMINAL
+
+requests==2.31.0
+colorama==0.4.6
+tqdm==4.66.1
+psutil==5.9.5
+pyfiglet==0.8.post1
+termcolor==2.3.0
+rich==13.7.0
+cryptography==41.0.7
